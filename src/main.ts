@@ -7,7 +7,7 @@ const raioDaBola = 10
 const alturaDaRaquete = 10
 const larguraDaRaquete = 75
 const contagemDeBlocosEmLinha = 6
-const contagemDeBlocosEmColuna = 3
+const contagemDeBlocosEmColuna = 6
 const larguraDoBloco = 75
 const alturaDoBloco = 20
 const enchimentoDoBloco = 10
@@ -29,6 +29,7 @@ let dx = 2
 let dy = -2
 
 let pontos = 0
+let pontosProxNvl = 0
 let vidas = 3
 
 const blocos: Bloco[][] = []
@@ -75,15 +76,27 @@ function detectaColisao() {
         ) {
           dy = -dy
           bloco.estado = 0
+          pontosProxNvl++
           pontos++
 
-          if (pontos == contagemDeBlocosEmLinha * contagemDeBlocosEmColuna) {
+          if (pontosProxNvl == contagemDeBlocosEmLinha * contagemDeBlocosEmColuna) {
             alert('Você ganhou, parabéns')
+            dy *= 1.3
+            dx *= 1.3
+            pontosProxNvl = 0
+            inicializaBolaRaquete()
+            redesenhaBlocos()
           }
         }
       }
     }
   }
+}
+
+function inicializaBolaRaquete(){
+  x = canvas.width / 2
+  y = canvas.height - 30
+  raqueteX = (canvas.width - larguraDaRaquete) / 2
 }
 
 function desenhaBola() {
@@ -108,13 +121,13 @@ function desenhaRaquete() {
 }
 
 function desenhaPontos() {
-  context.font = '24px Arial'
+  context.font = '12px Arial'
   context.fillStyle = 'white'
   context.fillText(`Pontos: ${pontos}`, 8, 30)
 }
 
 function desenhaVidas() {
-  context.font = '24px Arial'
+  context.font = '12px Arial'
   context.fillStyle = 'lime'
   context.fillText(`Vidas: ${vidas}`, canvas.width - 100, 30)
 }
@@ -134,6 +147,23 @@ function desenhaBlocos() {
 
         context.beginPath()
         context.rect(blocoX, blocoY, larguraDoBloco, alturaDoBloco)
+        context.fillStyle = 'deeppink'
+        context.fill()
+        context.closePath()
+      }
+    }
+  }
+}
+function redesenhaBlocos() {
+  for (let c = 0; c < contagemDeBlocosEmColuna; c++) {
+    for (let r = 0; r < contagemDeBlocosEmLinha; r++) {
+      if (blocos[c][r].estado == 0) {
+
+        blocos[c][r].x = 0
+        blocos[c][r].y = 0
+        blocos[c][r].estado = 1
+        context.beginPath()
+        context.rect(0, 0, larguraDoBloco, alturaDoBloco)
         context.fillStyle = 'deeppink'
         context.fill()
         context.closePath()
@@ -167,8 +197,6 @@ function desenha() {
       } else {
         x = canvas.width / 2
         y = canvas.height - 30
-        dx = 2
-        dy = -2
         raqueteX = (canvas.width - larguraDaRaquete) / 2
       }
     }
